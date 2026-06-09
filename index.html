@@ -1,132 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<title>Wayfarer Email Template Library</title>
+<meta charset="UTF-8">
+<title>Wayfarer Email Templates</title>
 <style>
-  body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
-  h1 { color: #1a1a2e; text-align: center; margin-bottom: 5px; }
-  p.sub { text-align: center; color: #666; margin-bottom: 30px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
-  .card { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden; }
-  .card-header { background: #1a1a2e; color: #fff; padding: 15px 20px; }
-  .card-header h3 { margin: 0; font-size: 15px; }
-  .card-header span { font-size: 12px; color: #a0a8c0; }
-  .card-body { padding: 15px 20px; }
-  .preview { width: 100%; height: 120px; border: 1px solid #eee; border-radius: 6px; overflow: hidden; background: #fafafa; cursor: pointer; }
-  .preview iframe { width: 100%; height: 100%; border: none; pointer-events: none; transform: scale(0.5); transform-origin: top left; width: 200%; height: 200%; }
-  .btn-row { display: flex; gap: 10px; margin-top: 12px; }
-  .btn { flex: 1; padding: 8px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }
-  .btn-copy { background: #1a1a2e; color: #fff; }
-  .btn-copy:hover { background: #2d2d4e; }
-  .btn-preview { background: #f0f2f5; color: #1a1a2e; }
-  .btn-preview:hover { background: #e0e2e5; }
-  .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #27ae60; color: #fff; padding: 12px 28px; border-radius: 30px; font-weight: 600; display: none; z-index: 999; }
-  .modal { display: none; position: fixed; top:0;left:0;right:0;bottom:0; background: rgba(0,0,0,0.7); z-index: 100; justify-content: center; align-items: center; }
-  .modal-inner { background: #fff; border-radius: 12px; width: 90%; max-width: 900px; max-height: 90vh; display: flex; flex-direction: column; }
-  .modal-header { background: #1a1a2e; color: #fff; padding: 15px 20px; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center; }
-  .modal-close { background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; }
-  .modal-body { flex: 1; overflow: auto; }
-  .modal-body iframe { width: 100%; height: 600px; border: none; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f0f2f5;padding:24px}
+h1{text-align:center;color:#1a1a2e;font-size:26px;margin-bottom:6px}
+.sub{text-align:center;color:#888;font-size:14px;margin-bottom:28px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;max-width:1200px;margin:0 auto}
+.card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+.card-top{padding:24px 20px;color:#fff}
+.story-num{font-size:11px;letter-spacing:2px;opacity:0.85;text-transform:uppercase}
+.headline{font-size:16px;font-weight:700;line-height:1.4;margin-top:8px}
+.card-bottom{padding:16px 20px}
+.date{font-size:12px;color:#999;margin-bottom:12px}
+.btns{display:flex;gap:10px}
+.btn-copy{flex:1;background:#1a1a2e;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600}
+.btn-copy:hover{background:#2d2d4e}
+.btn-preview{flex:1;background:#f0f2f5;color:#1a1a2e;padding:10px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;text-align:center;display:block}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#27ae60;color:#fff;padding:12px 28px;border-radius:30px;font-weight:600;display:none;z-index:999}
 </style>
 </head>
 <body>
-
-<h1>📧 Wayfarer Email Template Library</h1>
-<p class="sub">Click any template to copy its HTML and paste directly into Netcore</p>
-
-<div class="grid" id="templateGrid">
-  <!-- Templates are listed below — add new ones each day -->
-</div>
-
-<div class="toast" id="toast">✅ HTML Copied to Clipboard!</div>
-
-<div class="modal" id="modal">
-  <div class="modal-inner">
-    <div class="modal-header">
-      <span id="modalTitle">Template Preview</span>
-      <button class="modal-close" onclick="closeModal()">×</button>
-    </div>
-    <div class="modal-body">
-      <iframe id="modalFrame"></iframe>
-    </div>
-  </div>
-</div>
-
+<h1>📧 Wayfarer Email Templates</h1>
+<p class="sub">Click <strong>Copy HTML</strong> on any card &rarr; paste directly into Netcore</p>
+<div class="grid"><div class="card">
+      <div class="card-top" style="background:#c0392b">
+        <span class="story-num">Story 1 &bull; Middle East</span>
+        <div class="headline">Israel Strikes Lebanon and Gaza, Iran Suspends US Talks</div>
+      </div>
+      <div class="card-bottom">
+        <div class="date">June 5, 2026</div>
+        <div class="btns">
+          <button onclick="copyHTML('story1_middleeast_june5.html')" class="btn-copy">📋 Copy HTML</button>
+          <a href="story1_middleeast_june5.html" target="_blank" class="btn-preview">👁 Preview</a>
+        </div>
+      </div>
+    </div><div class="card">
+      <div class="card-top" style="background:#2980b9">
+        <span class="story-num">Story 2 &bull; Technology</span>
+        <div class="headline">Global AI Governance Framework Enters First Phase</div>
+      </div>
+      <div class="card-bottom">
+        <div class="date">June 5, 2026</div>
+        <div class="btns">
+          <button onclick="copyHTML('story2_ai_june5.html')" class="btn-copy">📋 Copy HTML</button>
+          <a href="story2_ai_june5.html" target="_blank" class="btn-preview">👁 Preview</a>
+        </div>
+      </div>
+    </div><div class="card">
+      <div class="card-top" style="background:#27ae60">
+        <span class="story-num">Story 3 &bull; Climate</span>
+        <div class="headline">WMO: 2026 Temperatures on Track but Extreme Weather Surging</div>
+      </div>
+      <div class="card-bottom">
+        <div class="date">June 5, 2026</div>
+        <div class="btns">
+          <button onclick="copyHTML('story3_climate_june5.html')" class="btn-copy">📋 Copy HTML</button>
+          <a href="story3_climate_june5.html" target="_blank" class="btn-preview">👁 Preview</a>
+        </div>
+      </div>
+    </div><div class="card">
+      <div class="card-top" style="background:#e67e22">
+        <span class="story-num">Story 4 &bull; Economy</span>
+        <div class="headline">Fed and ECB Hold Cautious Stance on Interest Rate Cuts</div>
+      </div>
+      <div class="card-bottom">
+        <div class="date">June 5, 2026</div>
+        <div class="btns">
+          <button onclick="copyHTML('story4_economy_june5.html')" class="btn-copy">📋 Copy HTML</button>
+          <a href="story4_economy_june5.html" target="_blank" class="btn-preview">👁 Preview</a>
+        </div>
+      </div>
+    </div><div class="card">
+      <div class="card-top" style="background:#8e44ad">
+        <span class="story-num">Story 5 &bull; Politics</span>
+        <div class="headline">Jill Biden Reveals Inside Story of Biden Reelection Dropout</div>
+      </div>
+      <div class="card-bottom">
+        <div class="date">June 5, 2026</div>
+        <div class="btns">
+          <button onclick="copyHTML('story5_politics_june5.html')" class="btn-copy">📋 Copy HTML</button>
+          <a href="story5_politics_june5.html" target="_blank" class="btn-preview">👁 Preview</a>
+        </div>
+      </div>
+    </div></div>
+<div class="toast" id="toast">✅ HTML Copied! Paste into Netcore</div>
 <script>
-// ============================================================
-// TEMPLATE LIBRARY — Add new templates here each day
-// Format: { title, date, file }
-// ============================================================
-var templates = [
-  {
-    title: "Top 5 World News – June 5, 2026",
-    date: "5 June 2026",
-    file: "daily_email_June5_2026.html"
-  },
-  {
-    title: "Moon's Origin Story",
-    date: "8 June 2026",
-    file: "moons_origin_story.html"
-  }
-  // Add more templates here as you go:
-  // { title: "Top 5 News – June 6, 2026", date: "6 June 2026", file: "daily_email_June6_2026.html" },
-];
-
-// ============================================================
-function buildGrid() {
-  var grid = document.getElementById('templateGrid');
-  if (templates.length === 0) {
-    grid.innerHTML = '<p style="text-align:center;color:#999;grid-column:1/-1">No templates yet. Add HTML files and update the list above.</p>';
-    return;
-  }
-  templates.forEach(function(t, i) {
-    var card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <div class="card-header">
-        <h3>${t.title}</h3>
-        <span>📅 ${t.date}</span>
-      </div>
-      <div class="card-body">
-        <div class="preview">
-          <iframe src="${t.file}" sandbox="allow-same-origin"></iframe>
-        </div>
-        <div class="btn-row">
-          <button class="btn btn-copy" onclick="copyTemplate('${t.file}', '${t.title}')">📋 Copy HTML</button>
-          <button class="btn btn-preview" onclick="previewTemplate('${t.file}', '${t.title}')">👁 Preview</button>
-        </div>
-      </div>
-    `;
-    grid.appendChild(card);
-  });
+function copyHTML(file){
+  fetch(file).then(r=>r.text()).then(html=>{
+    navigator.clipboard.writeText(html).then(()=>{
+      var t=document.getElementById('toast');
+      t.style.display='block';
+      setTimeout(()=>t.style.display='none',2500);
+    });
+  }).catch(e=>alert('Error: '+e));
 }
-
-function copyTemplate(file, title) {
-  fetch(file)
-    .then(r => r.text())
-    .then(html => {
-      navigator.clipboard.writeText(html).then(() => {
-        var toast = document.getElementById('toast');
-        toast.style.display = 'block';
-        setTimeout(() => { toast.style.display = 'none'; }, 2500);
-      });
-    })
-    .catch(() => alert('Could not load file: ' + file + '\nMake sure it is in the same folder as this page.'));
-}
-
-function previewTemplate(file, title) {
-  document.getElementById('modalTitle').textContent = title;
-  document.getElementById('modalFrame').src = file;
-  document.getElementById('modal').style.display = 'flex';
-}
-
-function closeModal() {
-  document.getElementById('modal').style.display = 'none';
-  document.getElementById('modalFrame').src = '';
-}
-
-buildGrid();
 </script>
 </body>
 </html>
