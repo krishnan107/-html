@@ -1,0 +1,111 @@
+name: Telegram Blog Publisher
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check Telegram approvals
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        run: |
+          python3 << 'PYEOF'
+          import json, os, shutil, urllib.request, urllib.error
+
+          TG = os.environ['TG_TOKEN']
+
+          # Load offset
+          offset = 0
+          try:
+            with open('.tg_offset') as f:
+              offset = int(f.read().strip() or 0)
+          except:
+            pass
+
+          # Get updates
+          try:
+            url = f"https://api.telegram.org/bot{TG}/getUpdates?offset={offset}&timeout=5&allowed_updates=callback_query"
+            with urllib.request.urlopen(url, timeout=15) as r:
+              data = json.loads(r.read())
+          except Exception as e:
+            print(f"Telegram error: {e}")
+            data = {'result': []}
+
+          updates = data.get('result', [])
+          new_offset = offset
+
+          for upd in updates:
+            new_offset = upd['update_id'] + 1
+            cb = upd.get('callback_query')
+            if not cb:
+              continue
+
+            cb_data = cb.get('data', '')
+            if ':' not in cb_data:
+              continue
+
+            action, fname = cb_data.split(':', 1)
+            cb_id   = cb['id']
+            msg_id  = cb['message']['message_id']
+            chat    = cb['message']['chat']['id']
+
+            def tg(method, body):
+              req = urllib.request.Request(
+                f"https://api.telegram.org/bot{TG}/{method}",
+                json.dumps(body).encode(),
+                {"Content-Type": "application/json"},
+                method="POST"
+              )
+              try:
+                urllib.request.urlopen(req, timeout=10)
+              except Exception as e:
+                print(f"TG send error: {e}")
+
+            if action == 'publish':
+              draft_path = f'_drafts/{fname}'
+              post_path  = f'_posts/{fname}'
+              if os.path.exists(draft_path):
+                shutil.move(draft_path, post_path)
+                tg('answerCallbackQuery', {'callback_query_id': cb_id, 'text': '✅ Published! Live in ~60s.'})
+                tg('editMessageText', {'chat_id': chat, 'message_id': msg_id,
+                   'text': f'✅ Blog post published! Live at https://krishnan107.github.io/-html'})
+                print(f"Published: {fname}")
+              else:
+                tg('answerCallbackQuery', {'callback_query_id': cb_id, 'text': '❓ Draft not found.'})
+
+            elif action == 'reject':
+              draft_path = f'_drafts/{fname}'
+              if os.path.exists(draft_path):
+                os.remove(draft_path)
+                tg('answerCallbackQuery', {'callback_query_id': cb_id, 'text': '🗑️ Post discarded.'})
+                tg('editMessageText', {'chat_id': chat, 'message_id': msg_id, 'text': '🗑️ Blog post discarded.'})
+                print(f"Rejected: {fname}")
+
+          # Save offset
+          with open('.tg_offset', 'w') as f:
+            f.write(str(new_offset))
+
+          print(f"Done. Processed {len(updates)} updates, offset now {new_offset}")
+          PYEOF
+
+      - name: Commit changes
+        run: |
+          git config user.name "Blog Bot"
+          git config user.email "bot@krishnan107.github.io"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+          else
+            git commit -m "Auto-publish approved post"
+            git push
+          fi
